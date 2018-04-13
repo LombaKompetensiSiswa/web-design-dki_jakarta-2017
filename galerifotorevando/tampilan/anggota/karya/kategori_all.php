@@ -1,0 +1,63 @@
+<?php
+$kategori = $koneksi->prepare('select *from kategori where id = "'.get('id').'"');
+$kategori->execute();
+$data_kategori = $kategori->fetch(PDO::FETCH_ASSOC);
+
+$karya = $koneksi->prepare('select *from karya where kategori_id = "'.get('id').'" and fotografer_id = "'.$data_user_mapping['id'].'" order by id desc');
+$karya->execute();
+$data_karya = $karya->fetchAll();
+?>
+<div class="row">
+  <div class="col s12">
+    <div class="breadcrumb">
+      <ul>
+        <li><a href="dashboard.php">Dashboard</a></li>
+        <li><a href="dashboard.php?p=karya">Karya</a></li>
+        <li><a href="dashboard.php?p=karya&m=kategori&id=<?php echo $data_kategori['id']; ?>">Kategori <?php echo $data_kategori['nama']; ?></a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col s12">
+    <h2>Galeri Karya pada Kategori <?php echo $data_kategori['nama']; ?></h2>
+  </div>
+</div>
+<div class="row">
+  <div class="col s12">
+    <a href="dashboard.php?p=karya&m=add" class="btn">Upload Galeri</a>
+  </div>
+</div>
+<div class="row">
+  <?php
+  foreach ($data_karya as $data_karya_key => $data_karya_value) {
+    $kategori = $koneksi->prepare('select *from kategori where id = "'.$data_karya_value['kategori_id'].'"');
+    $kategori->execute();
+    $data_kategori = $kategori->fetch(PDO::FETCH_ASSOC);
+  ?>
+  <div class="col s-card">
+    <div class="card">
+      <div class="card-img">
+        <a href="dashboard.php?p=karya&m=detail&id=<?php echo $data_karya_value['id']; ?>" class="card-img-content">
+          <img src="assets/img/karya/<?php echo $data_karya_value['foto']; ?>">
+        </a>
+      </div>
+      <div class="card-content">
+        <div class="card-title">
+          <a href="dashboard.php?p=karya&m=detail&id=<?php echo $data_karya_value['id']; ?>"><?php echo $data_karya_value['judul']; ?></a>
+        </div>
+        <div class="card-category">
+          <a href="dashboard.php?p=karya&m=kategori&id=<?php echo $data_kategori['id']; ?>" class="card-label"><?php echo $data_kategori['nama'];  ?></a>
+          <span class="card-label">Rate: <?php echo $data_karya_value['rate'];  ?></span>
+        </div>
+      </div>
+      <div class="card-action">
+        <a href="dashboard.php?p=karya&m=edit&id=<?php echo $data_karya_value['id']; ?>" class="btn">Edit</a>
+        <a href="proses/anggota/karya/delete.php?id=<?php echo $data_karya_value['id']; ?>" class="btn red" onclick="return confirm('Apakah anda yakin ingin menghapus <?php echo $data_karya_value['judul']; ?>?')">Hapus</a>
+      </div>
+    </div>
+  </div>
+  <?php
+  }
+  ?>
+</div>
